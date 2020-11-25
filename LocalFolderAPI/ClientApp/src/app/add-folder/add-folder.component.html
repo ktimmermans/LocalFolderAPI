@@ -1,0 +1,117 @@
+<form>
+  <div class="row">
+    <div class="col">
+      <h4>
+        General folder configuration
+      </h4>
+    </div>
+  </div>
+  <div class="row alert alert-danger" *ngIf="submitError">
+    {{submitError}}
+  </div>
+  <div class="row">
+    <label>Folder name:</label>
+    <input name="folderName"
+           placeholder="foldername"
+           type="text"
+           [(ngModel)]="newfolder.folderName"
+           class="form-control">
+  </div>
+  <div class="row">
+    <label>Folder path:</label>
+    <input name="folderPath"
+           placeholder="foldername"
+           type="text"
+           [(ngModel)]="newfolder.path"
+           (ngModelChange)="getSubfolders()"
+           class="form-control">
+    <div class="card w-100 bg-light" *ngIf="subfolders || subFolderError">
+      <div class="text-danger" *ngIf="subFolderError">
+        {{subFolderError}}
+      </div>
+      <table class="card-body table table-hover" *ngIf="!subFolderError">
+        <thead>
+          <tr>
+            <th colspan="2">
+              Folders inside current folder:
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subfolder of subfolders" [class]="subfolder == newfolder.path ? 'info' : ''">
+            <td>
+              {{subfolder}}
+            </td>
+            <td><button class="btn btn-info" (click)="setPath(subfolder)">Select</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h4>
+        Polling
+      </h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="custom-control custom-checkbox">
+      <input type="checkbox" class="custom-control-input" id="polling" name="polling" [(ngModel)]="newfolder.polling">
+      <label class="custom-control-label" for="polling">Poll folder every x time for new files</label>
+    </div>
+  </div>
+  <div *ngIf="newfolder.polling">
+    <div class="row">
+      <label>What to do with the file after processing?</label>
+      <select name="PollingType" [(ngModel)]="newfolder.pollingType" class="form-control" placeholder="Pick a value">
+        <option [ngValue]="0">Delete file</option>
+        <option [ngValue]="1">Move file to folder</option>
+      </select>
+    </div>
+
+    <div class="row" *ngIf="newfolder.pollingType && newfolder.pollingType === 1">
+      <label>Folder to place file after processing:</label>
+      <input name="MoveToFolder"
+             placeholder="foldername to place file after processing"
+             type="text"
+             [(ngModel)]="newfolder.moveToFolder"
+             class="form-control text-left">
+    </div>
+
+    <div class="row">
+      <label>API to post to after processing a file:</label>
+      <input name="apiUrl"
+             placeholder="api url to post"
+             type="text"
+             [(ngModel)]="newfolder.apiUrl"
+             class="form-control">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col"></div>
+    <div class="col-auto">
+      <button class="btn btn-success" (click)="addFolder()">Add folder</button>
+    </div>
+  </div>
+</form>
+<hr />
+
+<div class="row">
+  <h4>A new folder will be added to the configuration:</h4>
+</div>
+<div class="row">
+  <code *ngIf="!newfolder.polling">
+    [{{newfolder.folderName}}]<br />
+    Path = {{newfolder.path}}<br />
+    IsPolling = False
+  </code>
+  <code *ngIf="newfolder.polling">
+    [{{newfolder.folderName}}]<br />
+    Path = {{newfolder.path}}<br />
+    IsPolling = True<br />
+    PollingType = {{(newfolder.pollingType === 1 ? 'MoveAfterFind' : 'DeleteAfterFind')}}<br />
+    DestinationFolder = {{newfolder.moveToFolder}}<br />
+    ApiUrl = {{newfolder.apiUrl}}
+  </code>
+</div>
