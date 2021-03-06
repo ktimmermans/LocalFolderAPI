@@ -14,6 +14,12 @@ namespace Services.Interfaces
 
         void AddFolder(FolderConfig folderConfig);
 
+        FolderConfig GetFolderConfigByFolderName(string folderName);
+
+        void UpdateFolder(FolderConfig folderConfigNew, string folderNameOld);
+
+        void DeleteFolder(FolderConfig folderConfig);
+
         IEnumerable<string> GetAllFilesForFolder(string folderName);
 
         Task AddFileToFolder(string folderName, Stream file, FileSpec fileSpecifications);

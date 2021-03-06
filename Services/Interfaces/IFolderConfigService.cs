@@ -1,9 +1,5 @@
 ﻿using Services.DTO;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Interfaces
 {
@@ -11,11 +7,15 @@ namespace Services.Interfaces
     {
         IEnumerable<FolderConfig> GetAllConfiguredFolders();
 
+        FolderConfig GetFolderConfigByFolderName(string folderName);
+
         string GetPathForFolder(string folderName);
 
         int GetPollingDelayForFolder(string folderName);
 
         void AddFolderToConfigIni(FolderConfig folderConfig);
+        
+        void UpdateFolderFromConfigIni(FolderConfig folderConfigNew, string folderNameOld);
 
         void RemoveFolderFromConfigIni(FolderConfig folderConfig);
     }

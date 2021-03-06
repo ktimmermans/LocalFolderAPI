@@ -59,6 +59,23 @@ namespace Services
             this._folderConfigService.AddFolderToConfigIni(folderConfig);
         }
 
+        public FolderConfig GetFolderConfigByFolderName(string folderName)
+        {
+            var folder = this._folderConfigService.GetFolderConfigByFolderName(folderName);
+
+            return folder;
+        }
+
+        public void UpdateFolder(FolderConfig folderConfigNew, string folderNameOld)
+        {
+            this._folderConfigService.UpdateFolderFromConfigIni(folderConfigNew, folderNameOld);
+        }
+        
+        public void DeleteFolder(FolderConfig folderConfig)
+        {
+            this._folderConfigService.RemoveFolderFromConfigIni(folderConfig);
+        }
+
         public async Task AddFileToFolder(string folderName, Stream file, FileSpec fileSpecifications)
         {
             var fileName = $"{fileSpecifications.FileName}.{fileSpecifications.Extension}";

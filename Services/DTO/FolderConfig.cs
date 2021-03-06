@@ -14,7 +14,7 @@ namespace Services.DTO
 
         public bool Polling { get; set; }
 
-        public PollingType PollingType { get; set; }
+        public PollingType? PollingType { get; set; }
 
         public string MoveToFolder { get; set; }
 

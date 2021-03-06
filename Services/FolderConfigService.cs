@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Services
@@ -23,7 +24,8 @@ namespace Services
             ILogger<FolderConfigService> logger)
         {
             this._logger = logger;
-            this._rootDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            this._rootDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FolderPoller");
+            // Set desired ini path
             this._iniPath = Path.Combine(this._rootDir, CONFIG_FILE);
         }
 
@@ -34,7 +36,7 @@ namespace Services
             return folders;
         }
 
-        public string GetPathForFolder(string folderName)
+        private SectionData DoesFolderExistsInIni(string folderName)
         {
             var parser = new FileIniDataParser();
             var iniData = this.GetIniDateOrCreateFile();
@@ -44,20 +46,45 @@ namespace Services
             {
                 throw new Exception($"Folder: {folderName} does not exist in the config");
             }
+
+            return folder;
+        }
+
+        public FolderConfig GetFolderConfigByFolderName(string folderName)
+        {
+            var folder = DoesFolderExistsInIni(folderName);
+
+            bool isPolling = bool.Parse(folder.Keys.GetKeyData("IsPolling").Value);
+
+            var folderConfig = new FolderConfig
+            {
+                Path = folder.Keys.GetKeyData("Path").Value,
+                FolderName = folder.SectionName,
+            };
+
+            if (isPolling)
+            {
+                folderConfig.PollingType = (PollingType)Enum
+                    .Parse(typeof(PollingType), folder.Keys.GetKeyData("PollingType").Value);
+                folderConfig.MoveToFolder = folder.Keys.GetKeyData("DestinationFolder").Value;
+                folderConfig.ApiUrl = folder.Keys.GetKeyData("ApiUrl").Value;
+                folderConfig.Polling = isPolling;
+
+            }
+
+            return folderConfig;
+        }
+
+        public string GetPathForFolder(string folderName)
+        {
+            var folder = DoesFolderExistsInIni(folderName);
 
             return folder.Keys.First(x => x.KeyName == "Path").Value;
         }
 
         public int GetPollingDelayForFolder(string folderName)
         {
-            var parser = new FileIniDataParser();
-            var iniData = this.GetIniDateOrCreateFile();
-            var folder = iniData.Sections.FirstOrDefault(x => x.SectionName == folderName);
-
-            if (folder == null)
-            {
-                throw new Exception($"Folder: {folderName} does not exist in the config");
-            }
+            var folder = DoesFolderExistsInIni(folderName);
 
             return int.Parse(folder.Keys.First(x => x.KeyName == "Delay").Value);
         }
@@ -105,9 +132,11 @@ namespace Services
             var parser = new FileIniDataParser();
             var iniData = this.GetIniDateOrCreateFile();
 
-            if (iniData.Sections.Any(x => x.SectionName == folderConfig.FolderName))
+            var folderNameNoSpace = Regex.Replace(folderConfig.FolderName, @"\s+", "");
+
+            if (iniData.Sections.Any(x => x.SectionName == folderNameNoSpace))
             {
-                throw new Exception($"Folder: {folderConfig.FolderName} already exists");
+                throw new Exception($"Folder: {folderNameNoSpace} already exists");
             }
 
             var sectionKeys = new KeyDataCollection();
@@ -120,15 +149,25 @@ namespace Services
                 sectionKeys.AddKey("ApiUrl", folderConfig.ApiUrl);
             }
 
-            var data = new SectionData(folderConfig.FolderName)
+            var data = new SectionData(folderNameNoSpace)
             {
                 Keys = sectionKeys,
             };
 
-            this._logger.LogInformation($"Adding {folderConfig.FolderName} to ${CONFIG_FILE} at: {this._rootDir}");
+            this._logger.LogInformation($"Adding {folderNameNoSpace} to ${CONFIG_FILE} at: {this._rootDir}");
             iniData.Sections.Add(data);
 
             parser.WriteFile(this._iniPath, iniData);
+        }
+        
+        public void UpdateFolderFromConfigIni(FolderConfig folderConfigNew, string folderNameOld)
+        {
+            // Delete old add new
+
+            var oldFolder = GetFolderConfigByFolderName(folderNameOld);
+            RemoveFolderFromConfigIni(oldFolder);
+            
+            AddFolderToConfigIni(folderConfigNew);
         }
 
         public void RemoveFolderFromConfigIni(FolderConfig folderConfig)
@@ -139,7 +178,7 @@ namespace Services
             this._logger.LogInformation($"Removing {folderConfig.FolderName} from ${CONFIG_FILE} at: {this._rootDir}");
             iniData.Sections.RemoveSection(folderConfig.FolderName);
 
-            parser.WriteFile(CONFIG_FILE, iniData);
+            parser.WriteFile(this._iniPath, iniData);
         }
 
         private IniData GetIniDateOrCreateFile()
@@ -148,17 +187,22 @@ namespace Services
             var parser = new FileIniDataParser();
             IniData data;
 
-            try
+            // create directory
+            if (!Directory.Exists(this._rootDir))
             {
-                data = parser.ReadFile(this._iniPath);
+                Directory.CreateDirectory(this._rootDir);
             }
-            catch (Exception ex)
+            // Create file
+            if (!File.Exists(this._iniPath))
             {
-                this._logger.LogInformation($"{CONFIG_FILE} ini not found at: {this._rootDir}, creating one...");
-                data = new IniData();
-                // File does not exist, create it
-                parser.WriteFile(this._iniPath, data);
+                using (FileStream fs = new FileStream(this._iniPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    data = new IniData();
+                    // File does not exist, create it
+                    parser.WriteFile(this._iniPath, data);
+                }
             }
+            data = parser.ReadFile(this._iniPath);
 
             return data;
         }
