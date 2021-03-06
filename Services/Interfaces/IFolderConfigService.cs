@@ -5,6 +5,8 @@ namespace Services.Interfaces
 {
     public interface IFolderConfigService
     {
+        int GetPollingInterval();
+
         IEnumerable<FolderConfig> GetAllConfiguredFolders();
 
         FolderConfig GetFolderConfigByFolderName(string folderName);

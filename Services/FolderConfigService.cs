@@ -27,13 +27,22 @@ namespace Services
             this._rootDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FolderPoller");
             // Set desired ini path
             this._iniPath = Path.Combine(this._rootDir, CONFIG_FILE);
+
+            this.GetIniDateOrCreateFile();
         }
 
         public IEnumerable<FolderConfig> GetAllConfiguredFolders()
         {
-            var folders = this.ReadConfigIni();
+            var globalConfig = this.ReadConfigIni();
 
-            return folders;
+            return globalConfig.FolderConfigs;
+        }
+
+        public int GetPollingInterval()
+        {
+            var globalConfig = this.ReadConfigIni();
+
+            return globalConfig.PollingInterval;
         }
 
         private SectionData DoesFolderExistsInIni(string folderName)
@@ -89,44 +98,6 @@ namespace Services
             return int.Parse(folder.Keys.First(x => x.KeyName == "Delay").Value);
         }
 
-        private IEnumerable<FolderConfig> ReadConfigIni()
-        {
-            List<FolderConfig> folders = new List<FolderConfig>();
-            var parser = new FileIniDataParser();
-            var iniData = this.GetIniDateOrCreateFile();
-
-            this._logger.LogInformation($"Found: {iniData.Sections.Count} folder configurations");
-            foreach (var section in iniData.Sections)
-            {
-                var pollingString = section.Keys.GetKeyData("IsPolling").Value;
-                bool isPolling = bool.Parse(pollingString);
-
-                var folderConfig = new FolderConfig
-                {
-                    Polling = isPolling,
-                    FolderName = section.SectionName,
-                    Path = section.Keys.GetKeyData("Path").Value,
-                };
-
-                if (isPolling)
-                {
-                    var pollingTypeString = section.Keys.GetKeyData("PollingType").Value;
-                    var pollingType = (PollingType)Enum.Parse(typeof(PollingType), pollingTypeString);
-                    folderConfig.PollingType = pollingType;
-
-                    var destinationFolder = section.Keys.GetKeyData("DestinationFolder").Value;
-                    folderConfig.MoveToFolder = destinationFolder;
-
-                    var folderAPiUrl = section.Keys.GetKeyData("ApiUrl").Value;
-                    folderConfig.ApiUrl = folderAPiUrl;
-                }
-
-                folders.Add(folderConfig);
-            }
-
-            return folders;
-        }
-
         public void AddFolderToConfigIni(FolderConfig folderConfig)
         {
             var parser = new FileIniDataParser();
@@ -159,14 +130,14 @@ namespace Services
 
             parser.WriteFile(this._iniPath, iniData);
         }
-        
+
         public void UpdateFolderFromConfigIni(FolderConfig folderConfigNew, string folderNameOld)
         {
             // Delete old add new
 
             var oldFolder = GetFolderConfigByFolderName(folderNameOld);
             RemoveFolderFromConfigIni(oldFolder);
-            
+
             AddFolderToConfigIni(folderConfigNew);
         }
 
@@ -179,6 +150,53 @@ namespace Services
             iniData.Sections.RemoveSection(folderConfig.FolderName);
 
             parser.WriteFile(this._iniPath, iniData);
+        }
+
+        private GlobalConfig ReadConfigIni()
+        {
+            GlobalConfig globalConfig = new GlobalConfig();
+
+            globalConfig.FolderConfigs = new List<FolderConfig>();
+            var iniData = this.GetIniDateOrCreateFile();
+
+            this._logger.LogInformation($"Found: {iniData.Sections.Count} folder configurations");
+            foreach (var section in iniData.Sections)
+            {
+                var folderConfig = this.readFolderSection(section);
+
+                globalConfig.FolderConfigs.Add(folderConfig);
+            }
+
+            globalConfig.PollingInterval = int.Parse(iniData.GetKey("PollingInterval"));
+
+            return globalConfig;
+        }
+
+        private FolderConfig readFolderSection(SectionData section)
+        {
+            var pollingString = section.Keys.GetKeyData("IsPolling").Value;
+            bool isPolling = bool.Parse(pollingString);
+
+            var folderConfig = new FolderConfig
+            {
+                Polling = isPolling,
+                FolderName = section.SectionName,
+                Path = section.Keys.GetKeyData("Path").Value,
+            };
+
+            if (isPolling)
+            {
+                var pollingTypeString = section.Keys.GetKeyData("PollingType").Value;
+                var pollingType = (PollingType)Enum.Parse(typeof(PollingType), pollingTypeString);
+                folderConfig.PollingType = pollingType;
+
+                var destinationFolder = section.Keys.GetKeyData("DestinationFolder").Value;
+                folderConfig.MoveToFolder = destinationFolder;
+
+                var folderAPiUrl = section.Keys.GetKeyData("ApiUrl").Value;
+                folderConfig.ApiUrl = folderAPiUrl;
+            }
+            return folderConfig;
         }
 
         private IniData GetIniDateOrCreateFile()
@@ -195,14 +213,23 @@ namespace Services
             // Create file
             if (!File.Exists(this._iniPath))
             {
-                using (FileStream fs = new FileStream(this._iniPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                {
-                    data = new IniData();
-                    // File does not exist, create it
-                    parser.WriteFile(this._iniPath, data);
-                }
+                this._logger.LogInformation($"Config file not found, writing new {CONFIG_FILE} ini to: {this._rootDir}");
+                data = new IniData();
+                // Add default 60seconds delay for polling
+                data.Global.AddKey("PollingInterval", 60.ToString());
+                // File does not exist, create it
+                parser.WriteFile(this._iniPath, data);
             }
-            data = parser.ReadFile(this._iniPath);
+            else
+            {
+                data = parser.ReadFile(this._iniPath);
+            }
+
+            // Set default 60 seconds delay if it is missing
+            if (string.IsNullOrEmpty(data.Global.GetKeyData("PollingInterval")?.Value))
+            {
+                data.Global.AddKey("PollingInterval", 60.ToString());
+            }
 
             return data;
         }

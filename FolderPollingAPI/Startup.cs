@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Services;
 using Services.Interfaces;
-using Glitter.BackgroundWorker;
-using Glitter.BackgroundWorker.Interfaces;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Http.Features;
+using Background;
+using Background.Interfaces;
 
 namespace PSFolderPlugin
 {
@@ -35,9 +35,8 @@ namespace PSFolderPlugin
             services.AddHttpClient();
 
             // Add methods to process timedtask
-            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            services.AddHostedService<QueuedHostedService>();
             services.AddHostedService<TimedFolderPollingService>();
+            services.AddSingleton<IObjectBackgroundQueue<PollingTaskDescriptor>, ObjectBackgroundQueue<PollingTaskDescriptor>>();
 
 
             services.AddControllersWithViews();

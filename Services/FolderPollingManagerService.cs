@@ -1,6 +1,4 @@
-﻿using Glitter.BackgroundWorker;
-using Glitter.BackgroundWorker.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Services.DTO;
 using Services.Interfaces;
