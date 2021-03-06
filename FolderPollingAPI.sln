@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Servic
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FolderPoller", "FolderPoller\FolderPoller.vdproj", "{6587A27E-1194-4873-B933-8246042A0D06}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Background", "..\BackgroundWorkerAbstraction\Background\Background.csproj", "{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,14 @@ Global
 		{6587A27E-1194-4873-B933-8246042A0D06}.Release|Any CPU.ActiveCfg = Release
 		{6587A27E-1194-4873-B933-8246042A0D06}.Release|x64.ActiveCfg = Release
 		{6587A27E-1194-4873-B933-8246042A0D06}.Release|x64.Build.0 = Release
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Debug|x64.Build.0 = Debug|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Release|x64.ActiveCfg = Release|Any CPU
+		{F6415DD3-EEFC-409E-9C67-D29F84E9A1E0}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
