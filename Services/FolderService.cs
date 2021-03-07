@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using Services.FolderConfiguration;
 using Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services
@@ -32,11 +31,11 @@ namespace Services
             return dirList;
         }
 
-        public IEnumerable<string> GetAllFilesForFolder(string folderName)
+        public async Task<IEnumerable<string>> GetAllFilesForFolder(string folderName)
         {
-            var pathForFolder = this._folderConfigService.GetPathForFolder(folderName);
+            var folder = await this._folderConfigService.GetFolderConfigByFolderName(folderName);
 
-            var dirInfo = new DirectoryInfo($@"{pathForFolder}");
+            var dirInfo = new DirectoryInfo($@"{folder.Path}");
             var fileList = dirInfo.GetFiles().Select(x => x.FullName);
 
             return fileList;
@@ -44,8 +43,8 @@ namespace Services
 
         public async Task AddFileToFolder(string folderName, Stream file, string fileName)
         {
-            var pathForFolder = this._folderConfigService.GetPathForFolder(folderName);
-            var filePath = Path.Combine(pathForFolder, fileName);
+            var folder = await this._folderConfigService.GetFolderConfigByFolderName(folderName);
+            var filePath = Path.Combine(folder.Path, fileName);
 
             using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {

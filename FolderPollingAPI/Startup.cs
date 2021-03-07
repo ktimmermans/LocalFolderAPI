@@ -8,8 +8,10 @@ using Services;
 using Services.Interfaces;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Http.Features;
-using Background;
-using Background.Interfaces;
+using BackgroundWorker;
+using Services.Models;
+using Microsoft.EntityFrameworkCore;
+using Services.FolderConfiguration;
 
 namespace PSFolderPlugin
 {
@@ -25,18 +27,21 @@ namespace PSFolderPlugin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            this.ConfigureDatabase(services);
 
+            services.AddTransient<IFolderConfigurationProvider, IniConfigurationProvider>();
             services.AddScoped<IFolderConfigService, FolderConfigService>();
             services.AddScoped<IFolderService, FolderService>();
             services.AddScoped<IFolderManagerService, FolderManagerService>();
-            services.AddScoped<IFolderPollingManagerService, FolderPollingManagerService>();
+            services.AddTransient<IFolderPollingManagerService, FolderPollingManagerService>();
             services.AddScoped<IWebhookService, WebhookService>();
 
             services.AddHttpClient();
 
             // Add methods to process timedtask
+            services.AddTaskManager();
             services.AddHostedService<TimedFolderPollingService>();
-            services.AddSingleton<IObjectBackgroundQueue<PollingTaskDescriptor>, ObjectBackgroundQueue<PollingTaskDescriptor>>();
+            services.AddBackgroundQueue<PollingTaskDescriptor>();
 
 
             services.AddControllersWithViews();
@@ -115,5 +120,20 @@ namespace PSFolderPlugin
                 }
             });
         }
+
+        public virtual void ConfigureDatabase(IServiceCollection services)
+        {
+            var serviceProvider = new ServiceCollection()
+                    .AddEntityFrameworkInMemoryDatabase()
+                    .BuildServiceProvider();
+
+            services.AddDbContext<ProjectContext>(
+                options =>
+                {
+                    options.UseInMemoryDatabase("FolderConfig");
+                    options.UseInternalServiceProvider(serviceProvider);
+                }, ServiceLifetime.Transient);
+        }
+
     }
 }

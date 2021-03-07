@@ -1,12 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Services.DTO;
+﻿using Microsoft.Extensions.Logging;
 using Services.Interfaces;
+using Services.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services
@@ -40,7 +36,7 @@ namespace Services
             {
                 this._logger.LogInformation($"Listing files for folder {folderConfig.FolderName}");
 
-                var files = this._folderService.GetAllFilesForFolder(folderConfig.FolderName);
+                var files = await this._folderService.GetAllFilesForFolder(folderConfig.FolderName);
                 foreach (var file in files)
                 {
                     var fileSpec = new FileSpec
@@ -55,7 +51,7 @@ namespace Services
                         await this._webhookService.SendFileToAPI(fileStream, fileSpec, folderConfig.ApiUrl);
                     }
 
-                    ProcessFile(file, folderConfig.PollingType.Value, folderConfig.MoveToFolder);
+                    ProcessFile(file, folderConfig.PollingType, folderConfig.MoveToFolder);
                 }
             });
         }
@@ -67,16 +63,16 @@ namespace Services
         /// <param name="pollingType">Type of polling which determines what to do with the file</param>
         /// <param name="destinationFolder">The optional destinationfolder in case of MoveAfterFind</param>
         /// <returns>Nothing</returns>
-        private void ProcessFile(string file, PollingType pollingType, string destinationFolder = null)
+        private void ProcessFile(string file, string pollingType, string destinationFolder = null)
         {
             try
             {
-                if (pollingType == PollingType.DeleteAfterFind)
+                if (pollingType == PollingType.DeleteAfterFind.ToString())
                 {
                     this._logger.LogInformation($"Deleting file: {file}");
                     File.Delete(file);
                 }
-                else if (pollingType == PollingType.MoveAfterFind)
+                else if (pollingType == PollingType.MoveAfterFind.ToString())
                 {
                     if (string.IsNullOrEmpty(destinationFolder))
                     {

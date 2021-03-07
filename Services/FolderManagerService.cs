@@ -1,79 +1,82 @@
-﻿using Microsoft.Extensions.Logging;
-using Services.DTO;
+﻿using BackgroundWorker.TaskManager;
+using Services.FolderConfiguration;
 using Services.Interfaces;
-using System;
+using Services.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Services
 {
     public class FolderManagerService : IFolderManagerService
     {
-        private readonly ILogger<FolderManagerService> _logger;
-        private readonly IFolderPollingManagerService _folderPollingManager;
         private readonly IFolderConfigService _folderConfigService;
         private readonly IFolderService _folderService;
+        private readonly IBackgroundTaskManager _taskManager;
 
         public FolderManagerService(
-            IFolderPollingManagerService folderPollingManager,
             IFolderConfigService folderConfigService,
             IFolderService folderService,
-            ILogger<FolderManagerService> logger
+            IBackgroundTaskManager taskManager
             )
         {
-            this._folderPollingManager = folderPollingManager;
             this._folderConfigService = folderConfigService;
             this._folderService = folderService;
-            this._logger = logger;
+            this._taskManager = taskManager;
         }
 
-        public IEnumerable<FolderConfig> GetAllConfiguredFolders()
+        public async Task<IEnumerable<FolderConfig>> GetAllConfiguredFolders()
         {
-            var configs = this._folderConfigService.GetAllConfiguredFolders();
+            var configs = await this._folderConfigService.GetAllConfiguredFolders();
 
             return configs;
         }
 
-        public IEnumerable<FolderConfig> GetAllFoldersToPoll()
+        public async Task<IEnumerable<FolderConfig>> GetAllFoldersToPoll()
         {
-            var configs = this._folderConfigService.GetAllConfiguredFolders();
+            var configs = await this._folderConfigService.GetAllConfiguredFolders();
 
             var configsToPoll = configs.Where(x => x.Polling);
 
             return configsToPoll;
         }
 
-        public IEnumerable<string> GetAllFilesForFolder(string folderName)
+        public async Task<IEnumerable<string>> GetAllFilesForFolder(string folderName)
         {
-            var fileList = this._folderService.GetAllFilesForFolder(folderName);
+            var fileList = await this._folderService.GetAllFilesForFolder(folderName);
 
             return fileList;
         }
 
-
         public void AddFolder(FolderConfig folderConfig)
         {
-            this._folderConfigService.AddFolderToConfigIni(folderConfig);
+            this._folderConfigService.AddFolder(folderConfig);
+            if (folderConfig.Polling)
+            {
+                this._taskManager.AddTask(new PollingTaskDescriptor
+                {
+                    DelayMilliSeconds = 10000, // Start after 10 seconds
+                    FolderName = folderConfig.FolderName,
+                });
+            }
         }
 
-        public FolderConfig GetFolderConfigByFolderName(string folderName)
+        public async Task<FolderConfig> GetFolderConfigByFolderName(string folderName)
         {
-            var folder = this._folderConfigService.GetFolderConfigByFolderName(folderName);
+            var folder = await this._folderConfigService.GetFolderConfigByFolderName(folderName);
 
             return folder;
         }
 
         public void UpdateFolder(FolderConfig folderConfigNew, string folderNameOld)
         {
-            this._folderConfigService.UpdateFolderFromConfigIni(folderConfigNew, folderNameOld);
+            this._folderConfigService.UpdateFolder(folderConfigNew, folderNameOld);
         }
-        
+
         public void DeleteFolder(FolderConfig folderConfig)
         {
-            this._folderConfigService.RemoveFolderFromConfigIni(folderConfig);
+            this._folderConfigService.DeleteFolder(folderConfig.FolderName);
         }
 
         public async Task AddFileToFolder(string folderName, Stream file, FileSpec fileSpecifications)

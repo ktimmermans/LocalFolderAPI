@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Services.DTO
+﻿namespace Services.Models
 {
     public class FolderConfig
     {
@@ -14,7 +8,7 @@ namespace Services.DTO
 
         public bool Polling { get; set; }
 
-        public PollingType? PollingType { get; set; }
+        public string PollingType { get; set; }
 
         public string MoveToFolder { get; set; }
 

@@ -1,18 +1,17 @@
-﻿using Background;
-using Background.Interfaces;
+﻿using BackgroundWorker.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Services.FolderConfiguration;
 using Services.Interfaces;
+using Services.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Services
 {
-    public class TimedFolderPollingService : VoidBackgroundWorker<PollingTaskDescriptor>
+    public class TimedFolderPollingService : ObjectBackgroundWorker<PollingTaskDescriptor>
     {
         private readonly ILogger<TimedFolderPollingService> _logger;
         private readonly IObjectBackgroundQueue<PollingTaskDescriptor> _queue;
@@ -35,45 +34,90 @@ namespace Services
         public override async Task ProcessTaskException(IServiceScope scope, Exception ex)
         {
             this._logger.LogError($"Failed to complete polling folders with exception: {ex.Message}");
-            this.ReQueue(scope);
         }
 
-        public override async Task RunTask(IServiceScope scope)
+        public override async Task RunTaskWithItem(IServiceScope scope, PollingTaskDescriptor itemToProcess)
         {
-            _logger.LogDebug("Polling configured folders");
-            var _folderManagerService = scope.ServiceProvider.GetRequiredService<IFolderManagerService>();
-            var _pollingManager = scope.ServiceProvider.GetRequiredService<IFolderPollingManagerService>();
-
-            var foldersToPoll = _folderManagerService.GetAllFoldersToPoll();
-
-            List<Task> pollTaskList = new List<Task>();
-
-            foreach (var folder in foldersToPoll)
+            try
             {
-                var pollingTask = _pollingManager.CreatePollingTaskForFolder(folder);
-                pollTaskList.Add(pollingTask);
+                var _folderManagerService = scope.ServiceProvider.GetRequiredService<IFolderManagerService>();
+                var allFolders = _folderManagerService.GetAllConfiguredFolders();
+
+                if (string.IsNullOrEmpty(itemToProcess.FolderName))
+                {
+                    await this.PollAllFolders(scope);
+                }
+                else
+                {
+                    var folderToPoll = await _folderManagerService.GetFolderConfigByFolderName(itemToProcess.FolderName);
+                    await this.PollFolder(scope, folderToPoll);
+
+                }
             }
-
-            this._logger.LogInformation($"Starting {pollTaskList.Count} polling tasks");
-            Task.WaitAll(pollTaskList.AsParallel().WithDegreeOfParallelism(10).ToArray());
-            this._logger.LogInformation("finished all polling tasks");
-
-            this.ReQueue(scope);
+            catch (Exception ex)
+            {
+                await this.ReQueue(scope, itemToProcess.FolderName);
+                throw;
+            }
         }
 
-        private void ReQueue(IServiceScope scope)
+        private async Task PollFolder(IServiceScope scope, FolderConfig folderToPoll)
         {
-
-            var _folderConfigService = scope.ServiceProvider.GetRequiredService<IFolderConfigService>();
-            var delaySeconds = _folderConfigService.GetPollingInterval();
-            var pollingSettings = new PollingTaskDescriptor
+            using (var newScope = scope.ServiceProvider.CreateScope())
             {
-                DelayMilliSeconds = (delaySeconds * 1000),
-            };
+                this._logger.LogInformation($"Polling folder: {folderToPoll.FolderName}");
+                var _pollingManager = newScope.ServiceProvider.GetRequiredService<IFolderPollingManagerService>();
 
-            this._logger.LogInformation($"Beginning next poll in: {delaySeconds} seconds");
+                var pollingTask = _pollingManager.CreatePollingTaskForFolder(folderToPoll);
+                await pollingTask;
 
-            this._queue.Enqueue(pollingSettings);
+                await this.ReQueue(newScope, folderToPoll.FolderName);
+            }
+        }
+
+        private async Task PollAllFolders(IServiceScope scope)
+        {
+            using (var newScope = scope.ServiceProvider.CreateScope())
+            {
+
+                _logger.LogDebug("Polling configured folders");
+                var _folderManagerService = newScope.ServiceProvider.GetRequiredService<IFolderManagerService>();
+                var foldersToPoll = await _folderManagerService.GetAllFoldersToPoll();
+
+                List<Task> pollTaskList = new List<Task>();
+
+                foreach (var folder in foldersToPoll)
+                {
+                    pollTaskList.Add(PollFolder(newScope, folder));
+                }
+
+                if (pollTaskList.Count == 0)
+                {
+                    await this.ReQueue(newScope, string.Empty);
+                }
+
+                this._logger.LogInformation($"Starting {pollTaskList.Count} polling tasks");
+                Task.WaitAll(pollTaskList.AsParallel().WithDegreeOfParallelism(10).ToArray());
+                this._logger.LogInformation("finished all polling tasks");
+            }
+        }
+
+        private async Task ReQueue(IServiceScope scope, string folderName)
+        {
+            using (var newScope = scope.ServiceProvider.CreateScope())
+            {
+                var _folderConfigService = newScope.ServiceProvider.GetRequiredService<IFolderConfigService>();
+                var delaySeconds = await _folderConfigService.GetPollingInterval();
+                var pollingSettings = new PollingTaskDescriptor
+                {
+                    DelayMilliSeconds = (delaySeconds * 1000),
+                    FolderName = folderName,
+                };
+
+                this._logger.LogInformation($"Beginning next poll for folder: {folderName} in: {delaySeconds} seconds");
+
+                this._queue.Enqueue(pollingSettings);
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Services.Interfaces
     {
         IEnumerable<string> GetDirectoriesInFolder(string folder);
 
-        IEnumerable<string> GetAllFilesForFolder(string folderName);
+        Task<IEnumerable<string>> GetAllFilesForFolder(string folderName);
 
         Task AddFileToFolder(string folderName, Stream file, string fileName);
     }

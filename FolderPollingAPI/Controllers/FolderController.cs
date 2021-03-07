@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Services.DTO;
 using Services.Interfaces;
+using Services.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PSFolderPlugin.Controllers
@@ -57,12 +56,12 @@ namespace PSFolderPlugin.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<FolderConfig> GetFolderConfigByFolderName(string folderName)
+        public async Task<ActionResult<FolderConfig>> GetFolderConfigByFolderName(string folderName)
         {
             var folder = new FolderConfig();
             try
             {
-                folder = this._folderManager.GetFolderConfigByFolderName(folderName);
+                folder = await this._folderManager.GetFolderConfigByFolderName(folderName);
             }
             catch (Exception ex)
             {
@@ -81,9 +80,9 @@ namespace PSFolderPlugin.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IEnumerable<FolderConfig> Get()
+        public async Task<IEnumerable<FolderConfig>> Get()
         {
-            var configs = this._folderManager.GetAllConfiguredFolders();
+            var configs = await this._folderManager.GetAllConfiguredFolders();
 
             return configs;
         }
@@ -96,9 +95,9 @@ namespace PSFolderPlugin.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IEnumerable<string> GetFilesFromFolder(string folderName)
+        public async Task<IEnumerable<string>> GetFilesFromFolder(string folderName)
         {
-            var fileList = this._folderManager.GetAllFilesForFolder(folderName);
+            var fileList = await this._folderManager.GetAllFilesForFolder(folderName);
 
             return fileList;
         }
@@ -135,7 +134,7 @@ namespace PSFolderPlugin.Controllers
 
             return this.Ok();
         }
-        
+
         /// <summary>
         /// Delete folder in configuration
         /// </summary>
@@ -144,9 +143,9 @@ namespace PSFolderPlugin.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult DeleteFolder(string folderName)
+        public async Task<IActionResult> DeleteFolder(string folderName)
         {
-            this._folderManager.DeleteFolder(this._folderManager.GetFolderConfigByFolderName(folderName));
+            this._folderManager.DeleteFolder(await this._folderManager.GetFolderConfigByFolderName(folderName));
 
             return this.Ok();
         }
