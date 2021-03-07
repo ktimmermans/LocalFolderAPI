@@ -22,6 +22,10 @@ namespace Services.FolderConfiguration
             this.Initialize().GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// Get all FolderConfigs for the current configuration
+        /// </summary>
+        /// <returns>A list of FolderConfig objects</returns>
         public async Task<IEnumerable<FolderConfig>> GetAllConfiguredFolders()
         {
             var folders = await this._dbContext.Set<FolderConfig>().ToListAsync();
@@ -29,6 +33,10 @@ namespace Services.FolderConfiguration
             return folders;
         }
 
+        /// <summary>
+        /// Get the entire GlobalConfig
+        /// </summary>
+        /// <returns>GlobalConfig file if it exists, otherwise throws Exception</returns>
         public async Task<GlobalConfig> GetGlobalConfig()
         {
             var globalConfig = await this._dbContext.Set<GlobalConfig>().FirstOrDefaultAsync();
@@ -41,6 +49,10 @@ namespace Services.FolderConfiguration
             return globalConfig;
         }
 
+        /// <summary>
+        /// Read GlobalConfig and return the default polling interval
+        /// </summary>
+        /// <returns>An interval in seconds</returns>
         public async Task<int> GetPollingInterval()
         {
             var globalConfig = await this.GetGlobalConfig();
@@ -48,6 +60,11 @@ namespace Services.FolderConfiguration
             return globalConfig.PollingInterval;
         }
 
+        /// <summary>
+        /// Check if a FolderConfig exists for the given foldername
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns>True if it exists, else False</returns>
         public async Task<bool> FolderExists(string folderName)
         {
             var folder = await this._dbContext.Set<FolderConfig>().FirstOrDefaultAsync(x => x.FolderName == folderName);
@@ -55,6 +72,11 @@ namespace Services.FolderConfiguration
             return folder != null;
         }
 
+        /// <summary>
+        /// Retreive a specific FolderConfig object from the configuration
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns>A FolderConfig object if it exists, otherwise throws exception</returns>
         public async Task<FolderConfig> GetFolderConfigByFolderName(string folderName)
         {
             var folder = await this._dbContext.Set<FolderConfig>().FirstOrDefaultAsync(x => x.FolderName == folderName);
@@ -67,6 +89,11 @@ namespace Services.FolderConfiguration
             return folder;
         }
 
+        /// <summary>
+        /// Remove a FolderConfig from the current configuration, also saves the configuration file
+        /// </summary>
+        /// <param name="folderNameToDelete"></param>
+        /// <returns>Nothing</returns>
         public async Task DeleteFolder(string folderNameToDelete)
         {
             var folder = await this.GetFolderConfigByFolderName(folderNameToDelete);
@@ -77,6 +104,11 @@ namespace Services.FolderConfiguration
             await this.SaveConfig();
         }
 
+        /// <summary>
+        /// Add a new FolderConfig to the current configuration, also saves it to the configuration file
+        /// </summary>
+        /// <param name="folderConfig"></param>
+        /// <returns>Nothing</returns>
         public async Task AddFolder(FolderConfig folderConfig)
         {
             if (await this.FolderExists(folderConfig.FolderName))
@@ -89,6 +121,12 @@ namespace Services.FolderConfiguration
             await this.SaveConfig();
         }
 
+        /// <summary>
+        /// Update a FolderConfig in the current configuration, also saves it to the configuration file
+        /// </summary>
+        /// <param name="folderConfig"></param>
+        /// <param name="oldFolderName"></param>
+        /// <returns>Nothing</returns>
         public async Task UpdateFolder(FolderConfig folderConfig, string oldFolderName)
         {
             var folder = await this.GetFolderConfigByFolderName(oldFolderName);
@@ -113,6 +151,10 @@ namespace Services.FolderConfiguration
             await this.SaveConfig();
         }
 
+        /// <summary>
+        /// Try to fill the database initally, if it was already configured does nothing
+        /// </summary>
+        /// <returns>Nothing</returns>
         private async Task Initialize()
         {
             var existingConfig = await this._dbContext.Set<GlobalConfig>().FirstOrDefaultAsync();
@@ -126,6 +168,10 @@ namespace Services.FolderConfiguration
             }
         }
 
+        /// <summary>
+        /// Save the configuration file
+        /// </summary>
+        /// <returns>Nothing</returns>
         private async Task SaveConfig()
         {
             var config = await this.GetGlobalConfig();

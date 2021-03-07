@@ -25,6 +25,10 @@ namespace Services.FolderConfiguration
             this._iniPath = Path.Combine(this._rootDir, CONFIG_FILE);
         }
 
+        /// <summary>
+        /// Convert and save a GlobalConfig object to an ini file
+        /// </summary>
+        /// <param name="globalConfig"></param>
         public void SetGlobalConfiguration(GlobalConfig globalConfig)
         {
             var parser = new FileIniDataParser();
@@ -39,6 +43,10 @@ namespace Services.FolderConfiguration
             parser.WriteFile(this._iniPath, iniData);
         }
 
+        /// <summary>
+        /// Read the default ini file and convert the data to a GlobalConfig object
+        /// </summary>
+        /// <returns>A GlobalConfig object containing the folder polling information from the default .ini</returns>
         public GlobalConfig GetGlobalConfiguration()
         {
             var iniData = this.GetIniDataOrCreateFile();
@@ -60,6 +68,11 @@ namespace Services.FolderConfiguration
             return globalConfig;
         }
 
+        /// <summary>
+        /// Convert a FolderConfig object to an ini section
+        /// </summary>
+        /// <param name="folderConfig"></param>
+        /// <returns>An SectionData object containing the FolderConfig information</returns>
         private SectionData GetFolderSectionFromConfig(FolderConfig folderConfig)
         {
             var sectionData = new SectionData(folderConfig.FolderName);
@@ -79,6 +92,10 @@ namespace Services.FolderConfiguration
             return sectionData;
         }
 
+        /// <summary>
+        /// Read the default ini file. When no such file exists, create it and fill it with default data
+        /// </summary>
+        /// <returns>The IniData object containing all the read info, or a new IniData object containing default data</returns>
         private IniData GetIniDataOrCreateFile()
         {
             this._logger.LogInformation($"Reading {CONFIG_FILE} ini at: {this._rootDir}");
@@ -107,6 +124,10 @@ namespace Services.FolderConfiguration
             return data;
         }
 
+        /// <summary>
+        /// Create new IniData object with default information, also saves the default ini
+        /// </summary>
+        /// <returns>An IniData object with default information</returns>
         private IniData CreateDefaultConfig()
         {
             var parser = new FileIniDataParser();
@@ -127,6 +148,11 @@ namespace Services.FolderConfiguration
             return data;
         }
 
+        /// <summary>
+        /// Read an ini section and convert it to a FolderConfig object
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns>FolderConfig object containing information from the ini section</returns>
         private FolderConfig readFolderSection(SectionData section)
         {
             var pollingString = section.Keys.GetKeyData("IsPolling").Value;
@@ -146,6 +172,11 @@ namespace Services.FolderConfiguration
             return folderConfig;
         }
 
+        /// <summary>
+        /// Read polling information from an ini section for a specific folder
+        /// </summary>
+        /// <param name="folderConfig"></param>
+        /// <param name="section"></param>
         private void GetPollingConfigForFolder(FolderConfig folderConfig, SectionData section)
         {
             var pollingTypeString = section.Keys.GetKeyData("PollingType").Value;

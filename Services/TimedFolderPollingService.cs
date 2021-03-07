@@ -31,11 +31,23 @@ namespace Services
             });
         }
 
+        /// <summary>
+        /// Polling tasks that create an exception will trigger this function in order to handle the exception
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="ex"></param>
+        /// <returns>Nothing</returns>
         public override async Task ProcessTaskException(IServiceScope scope, Exception ex)
         {
             this._logger.LogError($"Failed to complete polling folders with exception: {ex.Message}");
         }
 
+        /// <summary>
+        /// Pick up a background folder polling task and process it
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="itemToProcess"></param>
+        /// <returns>Nothing</returns>
         public override async Task RunTaskWithItem(IServiceScope scope, PollingTaskDescriptor itemToProcess)
         {
             try
@@ -61,6 +73,13 @@ namespace Services
             }
         }
 
+
+        /// <summary>
+        /// Process a single folder and create a new background task to process them again
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="folderToPoll"></param>
+        /// <returns>Nothing</returns>
         private async Task PollFolder(IServiceScope scope, FolderConfig folderToPoll)
         {
             using (var newScope = scope.ServiceProvider.CreateScope())
@@ -75,6 +94,11 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Fetch a list of all configured folders and poll these. Then create background tasks for all folders to process them again
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <returns>Nothing</returns>
         private async Task PollAllFolders(IServiceScope scope)
         {
             using (var newScope = scope.ServiceProvider.CreateScope())
@@ -102,6 +126,12 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Create a new background task to process the folder again
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="folderName"></param>
+        /// <returns>Nothing</returns>
         private async Task ReQueue(IServiceScope scope, string folderName)
         {
             using (var newScope = scope.ServiceProvider.CreateScope())

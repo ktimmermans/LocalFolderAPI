@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Services.Interfaces;
 using Services.Models;
 using System;
 using System.IO;
@@ -32,28 +31,36 @@ namespace Services
         /// <returns>Nothing</returns>
         public async Task CreatePollingTaskForFolder(FolderConfig folderConfig)
         {
-            var task = Task.Factory.StartNew(async () =>
+            this._logger.LogInformation($"Listing files for folder {folderConfig.FolderName}");
+
+            var files = await this._folderService.GetAllFilesForFolder(folderConfig.FolderName);
+            foreach (var file in files)
             {
-                this._logger.LogInformation($"Listing files for folder {folderConfig.FolderName}");
+                await SendFileToApi(file, folderConfig);
 
-                var files = await this._folderService.GetAllFilesForFolder(folderConfig.FolderName);
-                foreach (var file in files)
-                {
-                    var fileSpec = new FileSpec
-                    {
-                        Extension = Path.GetExtension(file),
-                        FileName = Path.GetFileNameWithoutExtension(file),
-                    };
-                    this._logger.LogInformation($"Found file: {fileSpec.FileName}.{fileSpec.Extension}");
-                    using (var fileStream = File.OpenRead(file))
-                    {
-                        this._logger.LogInformation($"Processing webhook to post file: {fileSpec.FileName}{fileSpec.Extension} for folder: {folderConfig.FolderName}");
-                        await this._webhookService.SendFileToAPI(fileStream, fileSpec, folderConfig.ApiUrl);
-                    }
+                ProcessFile(file, folderConfig.PollingType, folderConfig.MoveToFolder);
+            }
+        }
 
-                    ProcessFile(file, folderConfig.PollingType, folderConfig.MoveToFolder);
-                }
-            });
+        /// <summary>
+        /// Send file to api by creating a filespec object and creating a http post to the API
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="folderConfig"></param>
+        /// <returns>Nothing</returns>
+        private async Task SendFileToApi(string file, FolderConfig folderConfig)
+        {
+            var fileSpec = new FileSpec
+            {
+                Extension = Path.GetExtension(file),
+                FileName = Path.GetFileNameWithoutExtension(file),
+            };
+            this._logger.LogInformation($"Found file: {fileSpec.FileName}.{fileSpec.Extension}");
+            using (var fileStream = File.OpenRead(file))
+            {
+                this._logger.LogInformation($"Processing webhook to post file: {fileSpec.FileName}{fileSpec.Extension} for folder: {folderConfig.FolderName}");
+                await this._webhookService.SendFileToAPI(fileStream, fileSpec, folderConfig.ApiUrl);
+            }
         }
 
         /// <summary>
@@ -74,17 +81,7 @@ namespace Services
                 }
                 else if (pollingType == PollingType.MoveAfterFind.ToString())
                 {
-                    if (string.IsNullOrEmpty(destinationFolder))
-                    {
-                        throw new ArgumentException($"File cannot be moved because there is no destination folder configured");
-                    }
-                    var rootPath = Path.GetDirectoryName(file);
-                    var filename = Path.GetFileName(file);
-                    var destinationPath = Path.Combine(rootPath, destinationFolder);
-                    var destinationFile = Path.Combine(destinationPath, filename);
-                    this.CreateDirectoryIfNotExists(destinationPath);
-                    this._logger.LogInformation($"Moving file: {file} to: {destinationFile}");
-                    File.Move(file, destinationFile);
+                    this.MoveFileToDestination(file, destinationFolder);
                 }
                 else
                 {
@@ -96,6 +93,26 @@ namespace Services
                 this._logger.LogError($"Processing file: {file} failed because: {ex.Message}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Move a file to supplied destination folder while making sure the directory is created if it does not exist already
+        /// </summary>
+        /// <param name="currentFile">The path to the file to move</param>
+        /// <param name="destinationFolder"></param>
+        private void MoveFileToDestination(string currentFile, string destinationFolder)
+        {
+            var rootPath = Path.GetDirectoryName(currentFile);
+            var filename = Path.GetFileName(currentFile);
+            var destinationPath = Path.Combine(rootPath, destinationFolder);
+
+            // make sure destination exists
+            this.CreateDirectoryIfNotExists(destinationPath);
+
+            // move file
+            var destinationFile = Path.Combine(destinationPath, filename);
+            this._logger.LogInformation($"Moving file: {currentFile} to: {destinationFile}");
+            File.Move(currentFile, destinationFile);
         }
 
         /// <summary>

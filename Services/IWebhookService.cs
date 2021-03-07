@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Services.Interfaces
+namespace Services
 {
     public interface IWebhookService
     {

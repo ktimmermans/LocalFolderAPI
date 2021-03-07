@@ -26,6 +26,10 @@ namespace Services
             this._taskManager = taskManager;
         }
 
+        /// <summary>
+        /// Get all currently configured folders
+        /// </summary>
+        /// <returns>A list of FolderConfig objects</returns>
         public async Task<IEnumerable<FolderConfig>> GetAllConfiguredFolders()
         {
             var configs = await this._folderConfigService.GetAllConfiguredFolders();
@@ -33,6 +37,10 @@ namespace Services
             return configs;
         }
 
+        /// <summary>
+        /// Get a list of all configured folders that have a polling option enabled
+        /// </summary>
+        /// <returns>A list of FolderConfig objects for folders that have a polling option enabled</returns>
         public async Task<IEnumerable<FolderConfig>> GetAllFoldersToPoll()
         {
             var configs = await this._folderConfigService.GetAllConfiguredFolders();
@@ -42,6 +50,11 @@ namespace Services
             return configsToPoll;
         }
 
+        /// <summary>
+        /// Get a list of all absolute paths to files in a folder
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns>A list of absolute paths to files in the folder</returns>
         public async Task<IEnumerable<string>> GetAllFilesForFolder(string folderName)
         {
             var fileList = await this._folderService.GetAllFilesForFolder(folderName);
@@ -49,6 +62,10 @@ namespace Services
             return fileList;
         }
 
+        /// <summary>
+        /// Add a new folderconfiguration to the config
+        /// </summary>
+        /// <param name="folderConfig"></param>
         public void AddFolder(FolderConfig folderConfig)
         {
             this._folderConfigService.AddFolder(folderConfig);
@@ -62,6 +79,11 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Get a FolderConfig by a foldername
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns>A FolderConfig object</returns>
         public async Task<FolderConfig> GetFolderConfigByFolderName(string folderName)
         {
             var folder = await this._folderConfigService.GetFolderConfigByFolderName(folderName);
@@ -69,16 +91,32 @@ namespace Services
             return folder;
         }
 
+        /// <summary>
+        /// Update a FolderConfig
+        /// </summary>
+        /// <param name="folderConfigNew">The new Folderconfig</param>
+        /// <param name="folderNameOld">The foldername as it is now</param>
         public void UpdateFolder(FolderConfig folderConfigNew, string folderNameOld)
         {
             this._folderConfigService.UpdateFolder(folderConfigNew, folderNameOld);
         }
 
+        /// <summary>
+        /// Remove a FolderConfig from the configuration
+        /// </summary>
+        /// <param name="folderConfig"></param>
         public void DeleteFolder(FolderConfig folderConfig)
         {
             this._folderConfigService.DeleteFolder(folderConfig.FolderName);
         }
 
+        /// <summary>
+        /// Add a file to a folder
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <param name="file"></param>
+        /// <param name="fileSpecifications"></param>
+        /// <returns>Nothing</returns>
         public async Task AddFileToFolder(string folderName, Stream file, FileSpec fileSpecifications)
         {
             var fileName = $"{fileSpecifications.FileName}.{fileSpecifications.Extension}";

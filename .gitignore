@@ -323,3 +323,4 @@ OpenCover/
 #don't include minified files that get generated on build
 **/wwwroot/css/site.min.css
 **/wwwroot/js/site.min.js
+.editorconfig
