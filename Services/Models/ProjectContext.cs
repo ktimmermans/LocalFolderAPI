@@ -25,6 +25,7 @@ namespace Services.Models
             modelbuilder.Entity<FolderConfig>().Property(x => x.MoveToFolder).HasColumnName("move_to_folder").IsRequired();
             modelbuilder.Entity<FolderConfig>().Property(x => x.Polling).HasColumnName("is_polling");
             modelbuilder.Entity<FolderConfig>().Property(x => x.PollingType).HasColumnName("polling_type");
+            modelbuilder.Entity<FolderConfig>().Property(x => x.IsRecursive).HasColumnName("is_recursive");
             modelbuilder.Entity<FolderConfig>().HasKey(x => new { x.FolderName });
 
         }

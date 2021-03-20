@@ -34,12 +34,20 @@ namespace Services
         /// </summary>
         /// <param name="folderName"></param>
         /// <returns>A list of absolute paths to files in a folder</returns>
-        public async Task<IEnumerable<string>> GetAllFilesForFolder(string folderName)
+        public async Task<IEnumerable<string>> GetAllFilesForFolder(string folderName, bool recursive = false)
         {
             var folder = await this._folderConfigService.GetFolderConfigByFolderName(folderName);
+            List<string> fileList = new List<string>();
 
             var dirInfo = new DirectoryInfo($@"{folder.Path}");
-            var fileList = dirInfo.GetFiles().Select(x => x.FullName);
+            fileList.AddRange(dirInfo.GetFiles().Select(x => x.FullName));
+
+            // Recursive 1 layer
+            foreach (var dir in dirInfo.GetDirectories())
+            {
+                var files = dir.GetFiles().Select(x => x.FullName);
+                fileList.AddRange(files);
+            }
 
             return fileList;
         }

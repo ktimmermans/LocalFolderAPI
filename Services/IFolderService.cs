@@ -17,8 +17,9 @@ namespace Services
         /// Get a list of files from a folder
         /// </summary>
         /// <param name="folderName"></param>
+        /// <param name="recursive">toggle recursive file retreival</param>
         /// <returns>A list of absolute paths to files in a folder</returns>
-        Task<IEnumerable<string>> GetAllFilesForFolder(string folderName);
+        Task<IEnumerable<string>> GetAllFilesForFolder(string folderName, bool recursive = false);
 
         /// <summary>
         /// Add a file to supplied folder

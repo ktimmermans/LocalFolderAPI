@@ -13,5 +13,7 @@
         public string MoveToFolder { get; set; }
 
         public string ApiUrl { get; set; }
+
+        public bool IsRecursive { get; set; }
     }
 }

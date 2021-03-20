@@ -33,7 +33,7 @@ namespace Services
         {
             this._logger.LogInformation($"Listing files for folder {folderConfig.FolderName}");
 
-            var files = await this._folderService.GetAllFilesForFolder(folderConfig.FolderName);
+            var files = await this._folderService.GetAllFilesForFolder(folderConfig.FolderName, folderConfig.IsRecursive);
             foreach (var file in files)
             {
                 await SendFileToApi(file, folderConfig);

@@ -88,9 +88,9 @@ namespace PSFolderPlugin.Controllers
         }
 
         /// <summary>
-        /// Get a list of all folders currently configured
+        /// Get a list of all files in the folder
         /// </summary>
-        /// <returns>A list of folders including their settings and properties</returns>
+        /// <returns>A list of all files in requested folder</returns>
         [HttpGet("{folderName}/files")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

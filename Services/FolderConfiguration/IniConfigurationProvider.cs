@@ -85,6 +85,7 @@ namespace Services.FolderConfiguration
                 sectionKeys.AddKey("DestinationFolder", folderConfig.MoveToFolder);
                 sectionKeys.AddKey("PollingType", folderConfig.PollingType.ToString());
                 sectionKeys.AddKey("ApiUrl", folderConfig.ApiUrl);
+                sectionKeys.AddKey("Recursive", folderConfig.IsRecursive.ToString());
             }
 
             sectionData.Keys = sectionKeys;
@@ -187,6 +188,9 @@ namespace Services.FolderConfiguration
 
             var folderAPiUrl = section.Keys.GetKeyData("ApiUrl").Value;
             folderConfig.ApiUrl = folderAPiUrl;
+
+            var IsRecursive = Convert.ToBoolean(section.Keys.GetKeyData("Recursive").Value);
+            folderConfig.IsRecursive = IsRecursive;
         }
     }
 }
