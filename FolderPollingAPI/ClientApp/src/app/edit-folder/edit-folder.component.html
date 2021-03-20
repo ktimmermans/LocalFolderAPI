@@ -1,6 +1,6 @@
 <div class="row">
 
-  <div class="col-sm">
+  <div class="col-sm" *ngIf="currentfolder">
 
     <div class="row">
       <div class="col">
@@ -84,7 +84,7 @@
             <label>What to do with the file after processing?</label>
             <select name="PollingType" [(ngModel)]="newfolder.pollingType" class="form-control" placeholder="Pick a value">
               <option [ngValue]="0">Delete file</option>
-              <option [ngValue]="1">Move file to folder</option>
+              <option [ngValue]="1" *ngIf="!newfolder.recursive">Move file to folder</option>
             </select>
           </div>
         </div>
@@ -105,6 +105,15 @@
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label></label>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="recursive" name="recursive" [(ngModel)]="newfolder.recursive">
+              <label class="custom-control-label" for="recursive">Recursive polling<br /><small>look for files in first layer of folders in the folder</small></label>
             </div>
           </div>
         </div>
@@ -135,7 +144,8 @@
               IsPolling = True<br />
               PollingType = {{(newfolder.pollingType === 1 ? 'MoveAfterFind' : 'DeleteAfterFind')}}<br />
               DestinationFolder = {{newfolder.moveToFolder}}<br />
-              ApiUrl = {{newfolder.apiUrl}}
+              ApiUrl = {{newfolder.apiUrl}}<br/>
+              Recursive = {{newfolder.recursive}}
             </code>
           </p>
         </div>

@@ -43,10 +43,13 @@ namespace Services
             fileList.AddRange(dirInfo.GetFiles().Select(x => x.FullName));
 
             // Recursive 1 layer
-            foreach (var dir in dirInfo.GetDirectories())
+            if (folder.IsRecursive)
             {
-                var files = dir.GetFiles().Select(x => x.FullName);
-                fileList.AddRange(files);
+                foreach (var dir in dirInfo.GetDirectories())
+                {
+                    var files = dir.GetFiles().Select(x => x.FullName);
+                    fileList.AddRange(files);
+                }
             }
 
             return fileList;

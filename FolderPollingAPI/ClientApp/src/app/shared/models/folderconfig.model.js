@@ -9,6 +9,7 @@ var FolderConfig = /** @class */ (function () {
         this.polling = (object && object.polling) ? object.polling : null;
         this.moveToFolder = (object && object.moveToFolder) ? object.moveToFolder : null;
         this.apiUrl = (object && object.apiUrl) ? object.apiUrl : null;
+        this.recursive = (object && object.recursive) ? object.recursive : null;
     }
     return FolderConfig;
 }());
