@@ -111,6 +111,13 @@ namespace Services.FolderConfiguration
         /// <returns>Nothing</returns>
         public async Task AddFolder(FolderConfig folderConfig)
         {
+            // No recursive polling and Move files since it can create an endless loop
+            if (folderConfig.IsRecursive && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
+            {
+                throw new Exception($"Files can not be moved to another direction when recursively polling for folder: {folderConfig.FolderName}");
+            }
+
+            // No adding folders with the same name
             if (await this.FolderExists(folderConfig.FolderName))
             {
                 throw new Exception($"Folder: {folderConfig.FolderName} already exist in the config");

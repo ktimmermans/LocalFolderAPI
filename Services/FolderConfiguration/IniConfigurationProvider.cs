@@ -191,6 +191,11 @@ namespace Services.FolderConfiguration
 
             var IsRecursive = Convert.ToBoolean(section.Keys.GetKeyData("Recursive").Value);
             folderConfig.IsRecursive = IsRecursive;
+
+            if (folderConfig.IsRecursive && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
+            {
+                throw new Exception($"Files can not be moved to another direction when recursively polling for folder: {folderConfig.FolderName}");
+            }
         }
     }
 }
