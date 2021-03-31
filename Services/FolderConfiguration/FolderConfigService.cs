@@ -111,11 +111,7 @@ namespace Services.FolderConfiguration
         /// <returns>Nothing</returns>
         public async Task AddFolder(FolderConfig folderConfig)
         {
-            // No recursive polling and Move files since it can create an endless loop
-            if (folderConfig.IsRecursive && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
-            {
-                throw new Exception($"Files can not be moved to another direction when recursively polling for folder: {folderConfig.FolderName}");
-            }
+            await this.CheckForValidFolderConfig(folderConfig);
 
             // No adding folders with the same name
             if (await this.FolderExists(folderConfig.FolderName))
@@ -136,6 +132,8 @@ namespace Services.FolderConfiguration
         /// <returns>Nothing</returns>
         public async Task UpdateFolder(FolderConfig folderConfig, string oldFolderName)
         {
+            await this.CheckForValidFolderConfig(folderConfig);
+
             var folder = await this.GetFolderConfigByFolderName(oldFolderName);
 
             folder.Path = folderConfig.Path;
@@ -147,12 +145,16 @@ namespace Services.FolderConfiguration
                 folder.ApiUrl = folderConfig.ApiUrl;
                 folder.MoveToFolder = folderConfig.MoveToFolder;
                 folder.PollingType = folderConfig.PollingType;
+                folder.IsRecursive = folderConfig.IsRecursive;
+                folder.CanOverwriteFiles = folderConfig.CanOverwriteFiles;
             }
             else
             {
                 folder.ApiUrl = null;
                 folder.MoveToFolder = null;
                 folder.PollingType = null;
+                folder.IsRecursive = false;
+                folder.CanOverwriteFiles = false;
             }
             await this._dbContext.SaveChangesAsync();
             await this.SaveConfig();
@@ -186,6 +188,21 @@ namespace Services.FolderConfiguration
             config.FolderConfigs = folders.ToList();
 
             this._configProvider.SetGlobalConfiguration(config);
+        }
+
+        private void CheckForValidFolderConfig(FolderConfig folderConfig)
+        {
+            // No recursive polling and Move files since it can create an endless loop
+            if (folderConfig.IsRecursive && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
+            {
+                throw new Exception($"Files can not be moved to another direction when recursively polling for folder: {folderConfig.FolderName}");
+            }
+
+            // No overwrite when files are deleted
+            if (folderConfig.CanOverwriteFiles && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
+            {
+                throw new Exception($"Overwriting files is nto allowed when deleting files after find for folder: {folderConfig.FolderName}");
+            }
         }
     }
 }

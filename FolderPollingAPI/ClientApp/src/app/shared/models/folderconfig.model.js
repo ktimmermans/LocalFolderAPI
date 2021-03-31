@@ -9,7 +9,8 @@ var FolderConfig = /** @class */ (function () {
         this.polling = (object && object.polling) ? object.polling : null;
         this.moveToFolder = (object && object.moveToFolder) ? object.moveToFolder : null;
         this.apiUrl = (object && object.apiUrl) ? object.apiUrl : null;
-        this.recursive = (object && object.recursive) ? object.recursive : null;
+        this.isRecursive = (object && object.isRecursive) ? object.isRecursive : false;
+        this.canOverwriteFiles = (object && object.canOverwriteFiles) ? object.canOverwriteFiles : false;
     }
     return FolderConfig;
 }());

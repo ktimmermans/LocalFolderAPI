@@ -86,6 +86,7 @@ namespace Services.FolderConfiguration
                 sectionKeys.AddKey("PollingType", folderConfig.PollingType.ToString());
                 sectionKeys.AddKey("ApiUrl", folderConfig.ApiUrl);
                 sectionKeys.AddKey("Recursive", folderConfig.IsRecursive.ToString());
+                sectionKeys.AddKey("OverwriteFiles", folderConfig.CanOverwriteFiles.ToString());
             }
 
             sectionData.Keys = sectionKeys;
@@ -189,8 +190,11 @@ namespace Services.FolderConfiguration
             var folderAPiUrl = section.Keys.GetKeyData("ApiUrl").Value;
             folderConfig.ApiUrl = folderAPiUrl;
 
-            var IsRecursive = Convert.ToBoolean(section.Keys.GetKeyData("Recursive").Value);
-            folderConfig.IsRecursive = IsRecursive;
+            var isRecursive = Convert.ToBoolean(section.Keys.GetKeyData("Recursive").Value ?? "False");
+            folderConfig.IsRecursive = isRecursive;
+
+            var canOverwriteFiles = Convert.ToBoolean(section.Keys.GetKeyData("OverwriteFiles")?.Value ?? "False");
+            folderConfig.CanOverwriteFiles = canOverwriteFiles;
 
             if (folderConfig.IsRecursive && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
             {

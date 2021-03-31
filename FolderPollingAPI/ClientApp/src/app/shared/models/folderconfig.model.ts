@@ -1,11 +1,12 @@
 export class FolderConfig {
   public folderName: string;
   public path: string;
-  public pollingType: number;
+  public pollingType: string;
   public polling: boolean;
   public moveToFolder: string;
   public apiUrl: string;
-  public recursive: boolean;
+  public isRecursive: boolean;
+  public canOverwriteFiles: boolean;
 
   constructor(object?: FolderConfig) {
     this.folderName = (object && object.folderName) ? object.folderName : null;
@@ -14,6 +15,7 @@ export class FolderConfig {
     this.polling = (object && object.polling) ? object.polling : null;
     this.moveToFolder = (object && object.moveToFolder) ? object.moveToFolder : null;
     this.apiUrl = (object && object.apiUrl) ? object.apiUrl : null;
-    this.recursive = (object && object.recursive) ? object.recursive : null;
+    this.isRecursive = (object && object.isRecursive) ? object.isRecursive : false;
+    this.canOverwriteFiles = (object && object.canOverwriteFiles) ? object.canOverwriteFiles : false;
   }
 }
