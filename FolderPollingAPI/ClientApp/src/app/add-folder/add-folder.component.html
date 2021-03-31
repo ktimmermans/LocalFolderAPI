@@ -82,12 +82,12 @@
           <div class="col">
             <label>What to do with the file after processing?</label>
             <select name="PollingType" [(ngModel)]="newfolder.pollingType" class="form-control" placeholder="Pick a value">
-              <option [ngValue]="0">Delete file</option>
-              <option [ngValue]="1" *ngIf="!newfolder.recursive">Move file to folder</option>
+              <option value="DeleteAfterFind">Delete file</option>
+              <option value="MoveAfterFind" *ngIf="!newfolder.isRecursive">Move file to folder</option>
             </select>
           </div>
         </div>
-        <div *ngIf="newfolder.pollingType && newfolder.pollingType === 1">
+        <div *ngIf="newfolder.pollingType && newfolder.pollingType === 'MoveAfterFind'">
           <div class="row">
             <div class="col">
               <label>Foldername to move file to after processing:</label>
@@ -105,17 +105,26 @@
               </div>
             </div>
           </div>
+          <div class="row">
+            <div class="col">
+              <label></label>
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="canOverwriteFiles" name="canOverwriteFiles" [(ngModel)]="newfolder.canOverwriteFiles">
+                <label class="custom-control-label" for="canOverwriteFiles">Overwrite existing files<br /><small>Overwrite existing files in the destination folder when they already exist</small></label>
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
         <div class="row">
           <div class="col">
             <label></label>
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="recursive" name="recursive" [(ngModel)]="newfolder.recursive">
+              <input type="checkbox" class="custom-control-input" id="recursive" name="recursive" [(ngModel)]="newfolder.isRecursive">
               <label class="custom-control-label" for="recursive">Recursive polling<br /><small>look for files in first layer of folders in the folder</small></label>
             </div>
           </div>
         </div>
-      </div>
       <div class="row">
         <div class="col">
           <br />
@@ -140,10 +149,11 @@
               [{{newfolder.folderName}}]<br />
               Path = {{newfolder.path}}<br />
               IsPolling = True<br />
-              PollingType = {{(newfolder.pollingType === 1 ? 'MoveAfterFind' : 'DeleteAfterFind')}}<br />
+              PollingType = {{newfolder.pollingType}}<br />
               DestinationFolder = {{newfolder.moveToFolder}}<br />
               ApiUrl = {{newfolder.apiUrl}}<br />
-              Recursive = {{newfolder.recursive}}
+              Recursive = {{newfolder.isRecursive}}
+              CanOverwriteFiles = {{newfolder.canOverwriteFiles}}
             </code>
           </p>
         </div>

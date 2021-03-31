@@ -38,7 +38,7 @@ namespace Services
             {
                 await SendFileToApi(file, folderConfig);
 
-                ProcessFile(file, folderConfig.PollingType, folderConfig.MoveToFolder);
+                ProcessFile(file, folderConfig);
             }
         }
 
@@ -70,18 +70,18 @@ namespace Services
         /// <param name="pollingType">Type of polling which determines what to do with the file</param>
         /// <param name="destinationFolder">The optional destinationfolder in case of MoveAfterFind</param>
         /// <returns>Nothing</returns>
-        private void ProcessFile(string file, string pollingType, string destinationFolder = null)
+        private void ProcessFile(string file, FolderConfig folderConfig)
         {
             try
             {
-                if (pollingType == PollingType.DeleteAfterFind.ToString())
+                if (folderConfig.PollingType == PollingType.DeleteAfterFind.ToString())
                 {
                     this._logger.LogInformation($"Deleting file: {file}");
                     File.Delete(file);
                 }
-                else if (pollingType == PollingType.MoveAfterFind.ToString())
+                else if (folderConfig.PollingType == PollingType.MoveAfterFind.ToString())
                 {
-                    this.MoveFileToDestination(file, destinationFolder);
+                    this.MoveFileToDestination(file, folderConfig.MoveToFolder, overWrite: folderConfig.CanOverwriteFiles);
                 }
                 else
                 {
@@ -100,7 +100,7 @@ namespace Services
         /// </summary>
         /// <param name="currentFile">The path to the file to move</param>
         /// <param name="destinationFolder"></param>
-        private void MoveFileToDestination(string currentFile, string destinationFolder)
+        private void MoveFileToDestination(string currentFile, string destinationFolder, bool overWrite = false)
         {
             var rootPath = Path.GetDirectoryName(currentFile);
             var filename = Path.GetFileName(currentFile);
@@ -112,7 +112,7 @@ namespace Services
             // move file
             var destinationFile = Path.Combine(destinationPath, filename);
             this._logger.LogInformation($"Moving file: {currentFile} to: {destinationFile}");
-            File.Move(currentFile, destinationFile);
+            File.Move(currentFile, destinationFile, overWrite);
         }
 
         /// <summary>

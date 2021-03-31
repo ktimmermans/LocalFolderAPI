@@ -15,5 +15,7 @@
         public string ApiUrl { get; set; }
 
         public bool IsRecursive { get; set; }
+
+        public bool CanOverwriteFiles { get; set; }
     }
 }
