@@ -111,7 +111,7 @@ namespace Services.FolderConfiguration
         /// <returns>Nothing</returns>
         public async Task AddFolder(FolderConfig folderConfig)
         {
-            await this.CheckForValidFolderConfig(folderConfig);
+            this.CheckForValidFolderConfig(folderConfig);
 
             // No adding folders with the same name
             if (await this.FolderExists(folderConfig.FolderName))
@@ -132,7 +132,7 @@ namespace Services.FolderConfiguration
         /// <returns>Nothing</returns>
         public async Task UpdateFolder(FolderConfig folderConfig, string oldFolderName)
         {
-            await this.CheckForValidFolderConfig(folderConfig);
+            this.CheckForValidFolderConfig(folderConfig);
 
             var folder = await this.GetFolderConfigByFolderName(oldFolderName);
 
