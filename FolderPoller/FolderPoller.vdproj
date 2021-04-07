@@ -21,13 +21,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_616A42374F0B4A1F88B08368515DF1B1"
+        "MsmKey" = "8:_A82C465A863649D1961FD68D7FF4DE6C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_D156DA6F87BD4C4AB417F2174B1D1430"
+        "MsmKey" = "8:_E6663E94B4114FC0B08989DAAC796245"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -153,10 +153,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D156DA6F87BD4C4AB417F2174B1D1430"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A82C465A863649D1961FD68D7FF4DE6C"
             {
-            "SourcePath" = "8:..\\FolderPollingAPI\\Unico_Anello.ico"
-            "TargetName" = "8:Unico_Anello.ico"
+            "SourcePath" = "8:..\\FolderPollingAPI\\unico_anello_i6v_icon.ico"
+            "TargetName" = "8:unico_anello_i6v_icon.ico"
             "Tag" = "8:"
             "Folder" = "8:_B6834D50A55541D6920B4353347734F4"
             "Condition" = "8:"
@@ -240,25 +240,25 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FolderPoller"
-        "ProductCode" = "8:{C7E3ED2B-0BE0-48CB-8052-668628800C9D}"
-        "PackageCode" = "8:{0AB28D25-DC44-4F92-ABDC-82AA84A484FC}"
+        "ProductCode" = "8:{A81F99CE-4B31-43FD-B5D3-21701FC75BF2}"
+        "PackageCode" = "8:{F1FEB573-27D3-4828-B5EC-A0F6F1E68FDE}"
         "UpgradeCode" = "8:{14074D57-256C-4AEF-B621-FDAF8155BB8C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Sparkles"
+        "ProductVersion" = "8:1.0.1"
+        "Manufacturer" = "8:Koen Timmermans"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
         "Title" = "8:FolderPoller"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:The FellowShip"
+        "ARPCONTACT" = "8:Koen Timmermans"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:_D156DA6F87BD4C4AB417F2174B1D1430"
+        "ARPPRODUCTICON" = "8:_A82C465A863649D1961FD68D7FF4DE6C"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -361,18 +361,18 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6A734BEE38724DA2B1BFED0033AC430B"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6FA0097151044096850B3AF24334FEA5"
             {
             "Name" = "8:FolderPoller"
             "Arguments" = "8:"
             "Description" = "8:"
-            "ShowCmd" = "3:7"
+            "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_5B55480D84A04FDA8AC2B5AAE8C07591"
             "Folder" = "8:_E6DADAE686C84EDAB2ED7CF9E70B07D6"
             "WorkingFolder" = "8:_B6834D50A55541D6920B4353347734F4"
-            "Icon" = "8:_D156DA6F87BD4C4AB417F2174B1D1430"
+            "Icon" = "8:_A82C465A863649D1961FD68D7FF4DE6C"
             "Feature" = "8:"
             }
         }
@@ -774,9 +774,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_616A42374F0B4A1F88B08368515DF1B1"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E6663E94B4114FC0B08989DAAC796245"
             {
-            "SourcePath" = "8:..\\FolderPollingAPI\\obj\\Release\\net5.0\\apphost.exe"
+            "SourcePath" = "8:..\\FolderPollingAPI\\obj\\Debug\\net5.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_B6834D50A55541D6920B4353347734F4"

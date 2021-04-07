@@ -65,6 +65,9 @@ namespace Services.FolderConfiguration
                 globalConfig.FolderConfigs.Add(folderConfig);
             }
 
+            // write config once to ensure previous versions are updated
+            this.SetGlobalConfiguration(globalConfig);
+
             return globalConfig;
         }
 
@@ -190,10 +193,19 @@ namespace Services.FolderConfiguration
             var folderAPiUrl = section.Keys.GetKeyData("ApiUrl").Value;
             folderConfig.ApiUrl = folderAPiUrl;
 
-            var isRecursive = Convert.ToBoolean(section.Keys.GetKeyData("Recursive").Value ?? "False");
+            bool isRecursive = false;
+            if (section.Keys.ContainsKey("Recursive"))
+            {
+                isRecursive = Convert.ToBoolean(section.Keys.GetKeyData("Recursive").Value);
+            }
             folderConfig.IsRecursive = isRecursive;
 
-            var canOverwriteFiles = Convert.ToBoolean(section.Keys.GetKeyData("OverwriteFiles")?.Value ?? "False");
+            bool canOverwriteFiles = false;
+            if (section.Keys.ContainsKey("OverwriteFiles"))
+            {
+                canOverwriteFiles = Convert.ToBoolean(section.Keys.GetKeyData("OverwriteFiles").Value);
+            }
+
             folderConfig.CanOverwriteFiles = canOverwriteFiles;
 
             if (folderConfig.IsRecursive && folderConfig.PollingType != PollingType.MoveAfterFind.ToString())
