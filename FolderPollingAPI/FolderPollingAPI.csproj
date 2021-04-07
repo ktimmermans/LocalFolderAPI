@@ -13,7 +13,6 @@
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
     <Platforms>AnyCPU;x64</Platforms>
     <UserSecretsId>61b829a4-9595-4cc5-b6bb-3a028672346c</UserSecretsId>
-    <ApplicationIcon>Unico_Anello.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -38,20 +37,24 @@
   <ItemGroup>
     <None Remove="ClientApp\src\app\shared\models\folderconfig.model.ts" />
     <None Remove="FolderConfiguration.ini" />
-    <None Remove="Unico_Anello.ico" />
+    <None Remove="unico_anello_i6v_icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="FolderConfiguration.ini">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-    <Content Include="Unico_Anello.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="unico_anello_i6v_icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="wwwroot\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="ClientApp\dist\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

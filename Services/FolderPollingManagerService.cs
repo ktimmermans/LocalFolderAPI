@@ -36,9 +36,17 @@ namespace Services
             var files = await this._folderService.GetAllFilesForFolder(folderConfig.FolderName, folderConfig.IsRecursive);
             foreach (var file in files)
             {
-                await SendFileToApi(file, folderConfig);
+                try
+                {
+                    await SendFileToApi(file, folderConfig);
 
-                ProcessFile(file, folderConfig);
+                    ProcessFile(file, folderConfig);
+                }
+                catch (Exception ex)
+                {
+                    this._logger.LogError($"Moving file to error folder because it failed to post to apiurl: {folderConfig.ApiUrl}");
+                    this.MoveFileToDestination(file, "error", true);
+                }
             }
         }
 
@@ -56,6 +64,7 @@ namespace Services
                 FileName = Path.GetFileNameWithoutExtension(file),
             };
             this._logger.LogInformation($"Found file: {fileSpec.FileName}.{fileSpec.Extension}");
+
             using (var fileStream = File.OpenRead(file))
             {
                 this._logger.LogInformation($"Processing webhook to post file: {fileSpec.FileName}{fileSpec.Extension} for folder: {folderConfig.FolderName}");
