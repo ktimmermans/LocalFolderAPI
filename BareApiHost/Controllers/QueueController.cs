@@ -6,10 +6,12 @@ using Services;
 using Services.Models;
 using System.Collections.Generic;
 
-namespace PSFolderPlugin.Controllers
+namespace BareApiHost.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class QueueController : ControllerBase
     {
         private readonly ILogger<QueueController> _logger;

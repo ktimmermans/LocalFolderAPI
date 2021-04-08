@@ -21,7 +21,7 @@ export class HomeComponent {
   ) {
     this.httpClient = http;
     this.baseUrl = baseUrl;
-    http.get<FolderConfig[]>(`${baseUrl}api/folder`).subscribe(result => {
+    http.get<FolderConfig[]>(`${baseUrl}api/v1/folder`).subscribe(result => {
       this.folders = result;
     }, error => console.error(error));
   }
@@ -37,7 +37,7 @@ export class HomeComponent {
   public deleteFolder(folderName): void {
 
     if (confirm("Are you sure you wish to delete " + folderName)) {
-      this.httpClient.post(`${this.baseUrl}api/folder/${folderName}/delete`, this.deleteFolder).subscribe(result => {
+      this.httpClient.post(`${this.baseUrl}api/v1/folder/${folderName}/delete`, this.deleteFolder).subscribe(result => {
         location.reload();
       }, error => {
         console.error(`${error}`);

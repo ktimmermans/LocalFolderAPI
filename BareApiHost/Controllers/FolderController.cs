@@ -8,10 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PSFolderPlugin.Controllers
+namespace BareApiHost.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class FolderController : ControllerBase
     {
         private readonly ILogger<FolderController> _logger;
