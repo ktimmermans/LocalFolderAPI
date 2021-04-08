@@ -39,7 +39,7 @@ export class EditFolderComponent {
     })
 
     this.httpClient
-      .get<FolderConfig>(`${this.baseUrl}api/folder/${encodeURI(this.currentfoldername)}/settings`)
+      .get<FolderConfig>(`${this.baseUrl}api/v1/folder/${encodeURI(this.currentfoldername)}/settings`)
       .subscribe(result => {
         this.currentfolder = result;
         this.setCurrentToNewFolder();
@@ -52,14 +52,14 @@ export class EditFolderComponent {
 
     // Check if current has API url otherwise set default
     if (!this.currentfolder.apiUrl) { 
-      this.currentfolder.apiUrl = `${this.baseUrl}api/test/receive`;
+      this.currentfolder.apiUrl = `${this.baseUrl}api/v1/test/receive`;
     }
 
     this.newfolder = this.currentfolder;
   }
 
   public getSubfolders(): void {
-    this.httpClient.get<string[]>(`${this.baseUrl}api/folder/${encodeURI(this.currentfolder.path)}`).subscribe(result => {
+    this.httpClient.get<string[]>(`${this.baseUrl}api/v1/folder/${encodeURI(this.currentfolder.path)}`).subscribe(result => {
       this.subFolderError = null;
       this.subfolders = result;
     }, error => {
@@ -74,7 +74,7 @@ export class EditFolderComponent {
   }
 
   public updateFolder(oldFolder): void {
-    this.httpClient.post(`${this.baseUrl}api/folder/${oldFolder}/update`, this.newfolder).subscribe(result => {
+    this.httpClient.post(`${this.baseUrl}api/v1/folder/${oldFolder}/update`, this.newfolder).subscribe(result => {
       this.router.navigate(['/']);
     }, error => {
       console.error(`${error}`);

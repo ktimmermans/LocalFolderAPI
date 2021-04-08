@@ -66,7 +66,7 @@ namespace Services
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await this.ReQueue(scope, itemToProcess.FolderName);
                 throw;

@@ -24,11 +24,11 @@ export class AddFolderComponent {
     this.newfolder = new FolderConfig();
     this.newfolder.polling = false;
     this.baseUrl = baseUrl;
-    this.newfolder.apiUrl = `${this.baseUrl}api/test/receive`;
+    this.newfolder.apiUrl = `${this.baseUrl}api/v1/test/receive`;
   }
 
   public getSubfolders(): void {
-    this.httpClient.get<string[]>(`${this.baseUrl}api/folder/${encodeURI(this.newfolder.path)}`).subscribe(result => {
+    this.httpClient.get<string[]>(`${this.baseUrl}api/v1/folder/${encodeURI(this.newfolder.path)}`).subscribe(result => {
       this.subFolderError = null;
       this.subfolders = result;
     }, error => {
@@ -43,7 +43,7 @@ export class AddFolderComponent {
   }
 
   public addFolder(): void {
-    this.httpClient.post(`${this.baseUrl}api/folder`, this.newfolder).subscribe(result => {
+    this.httpClient.post(`${this.baseUrl}api/v1/folder`, this.newfolder).subscribe(result => {
       this.newfolder = new FolderConfig();
       this.router.navigate(['/']);
     }, error => {

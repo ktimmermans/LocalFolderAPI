@@ -42,7 +42,7 @@ namespace Services
 
                     ProcessFile(file, folderConfig);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     this._logger.LogError($"Moving file to error folder because it failed to post to apiurl: {folderConfig.ApiUrl}");
                     this.MoveFileToDestination(file, "error", true);
