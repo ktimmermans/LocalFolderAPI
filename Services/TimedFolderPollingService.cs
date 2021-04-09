@@ -27,6 +27,7 @@ namespace Services
             this._logger.LogInformation($"Initiating folderpolling");
             this._queue.Enqueue(new PollingTaskDescriptor
             {
+                TaskName = "Initial polling",
                 DelayMilliSeconds = 500,
             });
         }
@@ -50,6 +51,7 @@ namespace Services
         /// <returns>Nothing</returns>
         public override async Task RunTaskWithItem(IServiceScope scope, PollingTaskDescriptor itemToProcess)
         {
+            this._logger.LogInformation($"Running pollingtask: {itemToProcess.TaskName}");
             try
             {
                 var _folderManagerService = scope.ServiceProvider.GetRequiredService<IFolderManagerService>();
