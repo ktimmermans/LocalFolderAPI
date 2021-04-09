@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="FolderPollerWPF.Controls.FolderOverview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:local="clr-namespace:FolderPollerWPF.Controls"
+             mc:Ignorable="d">
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LastChildFill="False">
+        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Label>test</Label>
+        </Grid>
+    <ListBox  DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+        <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel Orientation="Horizontal" ScrollViewer.CanContentScroll="True" mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Disabled" />
+            </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+            <ListBoxItem>
+                
+            </ListBoxItem>
+        </ListBox>
+    </DockPanel>
+</UserControl>
