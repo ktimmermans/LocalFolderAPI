@@ -67,7 +67,7 @@ namespace Services
             var folder = await this._folderConfigService.GetFolderConfigByFolderName(folderName);
             var filePath = Path.Combine(folder.Path, fileName);
 
-            using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
             {
                 await file.CopyToAsync(fs);
             }
